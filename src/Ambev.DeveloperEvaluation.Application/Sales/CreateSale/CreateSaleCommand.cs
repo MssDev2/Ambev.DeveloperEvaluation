@@ -42,7 +42,7 @@ public class CreateSaleCommand : IRequest<CreateSaleResult>
     /// <summary>
     /// Gets or sets the initial status of the sale account.
     /// </summary>
-    public SaleStatus Status { get; set; }
+    public SaleStatus IsCancelled { get; set; } = SaleStatus.NotCancelled;
 
     /// <summary>
     /// List of products that belong to the sale

@@ -42,7 +42,6 @@ public class Sale : BaseEntity
     /// Indicates whether the sale was cancelled
     /// </summary>
     public SaleStatus IsCancelled { get; set; }
-    public string Cancelled => IsCancelled.ToString();
 
     /// <summary>
     /// Total sale amount

@@ -4,6 +4,7 @@ using FluentValidation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Common.Security;
+using System.Net;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 
@@ -65,7 +66,7 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
         var existingSale = await _saleRepository.GetBysaleNumberAsync(command.SaleNumber, cancellationToken);
         if (existingSale != null)
-            throw new InvalidOperationException($"Sale with Number {command.SaleNumber} already exists");
+            throw new HttpRequestException($"Sale with Number {command.SaleNumber} already exists", null, HttpStatusCode.Conflict);
 
         var sale = _mapper.Map<Sale>(command);
 

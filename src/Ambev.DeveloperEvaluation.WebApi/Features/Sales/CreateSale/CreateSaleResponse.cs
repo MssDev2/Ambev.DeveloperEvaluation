@@ -11,14 +11,4 @@ public class CreateSaleResponse
     /// The unique identifier of the created sale
     /// </summary>
     public Guid Id { get; set; }
-
-    /// <summary>
-    /// The sale number
-    /// </summary>
-    public int SaleNumber { get; set; }
-
-    /// <summary>
-    /// The current status of the sale
-    /// </summary>
-    public SaleStatus Status { get; set; }
 }

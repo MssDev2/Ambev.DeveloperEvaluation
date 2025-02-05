@@ -6,7 +6,7 @@ using FluentValidation;
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 
 /// <summary>
-/// Validator for CreateSaleCommand that defines validation rules for user creation command.
+/// Validator for CreateSaleCommand that defines validation rules for sale creation command.
 /// </summary>
 public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
 {
@@ -22,8 +22,8 @@ public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
     /// </remarks>
     public CreateSaleCommandValidator()
     {
-        RuleFor(user => user.SaleNumber).GreaterThan(0);
-        RuleFor(user => user.Status).NotEqual(SaleStatus.Unknown);
+        RuleFor(sale => sale.SaleNumber).GreaterThan(0);
+        RuleFor(sale => sale.IsCancelled).NotEqual(SaleStatus.Unknown);
 
         RuleForEach(request => request.Products).ChildRules(items =>
         {
@@ -45,11 +45,11 @@ public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
         {
             return false;
         }
-        if (item.Quantity >= 4 && item.Quantity < 10 && item.Discount == 0)
+        if (item.Quantity >= 4 && item.Quantity < 10 && item.Discount <= 0)
         {
             return false;
         }
-        if (item.Quantity >= 10 && item.Quantity <= 20 && item.Discount == 0)
+        if (item.Quantity >= 10 && item.Quantity <= 20 && item.Discount <= 0)
         {
             return false;
         }

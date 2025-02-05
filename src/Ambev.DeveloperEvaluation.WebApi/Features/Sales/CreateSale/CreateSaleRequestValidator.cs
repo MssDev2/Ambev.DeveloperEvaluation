@@ -14,17 +14,19 @@ public class CreateSaleRequestValidator : AbstractValidator<CreateSaleRequest>
     /// </summary>
     /// <remarks>
     /// Validation rules include:
-    /// - Email: Must be valid format (using EmailValidator)
-    /// - Salename: Required, length between 3 and 50 characters
-    /// - Password: Must meet security requirements (using PasswordValidator)
-    /// - Phone: Must match international format (+X XXXXXXXXXX)
-    /// - Status: Cannot be Unknown
-    /// - Role: Cannot be None
+    /// - Sale number: Required, must be greater than 0
+    /// - IsCancelled: Cannot be Unknown
+    /// - Customer: Required, length between 3 and 50 characters
+    /// - Branch: Required, length between 3 and 50 characters
+    /// - Products: Required
+    /// - Products: Must have valid discount based on quantity
     /// </remarks>
     public CreateSaleRequestValidator()
     {
         RuleFor(sale => sale.SaleNumber).GreaterThan(0);
-        RuleFor(sale => sale.Status).NotEqual(SaleStatus.Unknown);
-        
+        RuleFor(sale => sale.IsCancelled).NotEqual(SaleStatus.Unknown);
+        RuleFor(sale => sale.Customer).NotEmpty();
+        RuleFor(sale => sale.Branch).NotEmpty();
+        RuleFor(sale => sale.Products).NotEmpty();
     }
 }

@@ -1,5 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Enums;
+﻿using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 
@@ -31,7 +30,7 @@ public class CreateSaleRequest
     /// <summary>
     /// Gets or sets the initial status of the sale account.
     /// </summary>
-    public SaleStatus Status { get; set; }
+    public SaleStatus IsCancelled { get; set; }
 
     /// <summary>
     /// List of products that belong to the sale
