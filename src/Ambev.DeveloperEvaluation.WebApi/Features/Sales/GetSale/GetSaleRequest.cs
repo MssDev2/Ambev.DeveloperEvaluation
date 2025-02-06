@@ -17,4 +17,23 @@ public class GetSaleRequest
     /// Sale number
     /// </summary>
     public int SaleNumber { get; set; }
+
+    /// <summary>
+    /// Page number
+    /// </summary>
+    public int Page { get; set; }
+    /// <summary>
+    /// Page size
+    /// </summary>
+    public int PageSize { get; set; }
+
+    /// <summary>
+    /// Order field
+    /// </summary>
+    public string OrderField { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Order ascending or descending
+    /// </summary>
+    public bool OrderAscending { get; set; }
 }

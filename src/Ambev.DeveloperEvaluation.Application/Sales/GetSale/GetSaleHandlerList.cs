@@ -11,19 +11,19 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 /// <summary>
 /// Handler for processing GetSaleCommand requests
 /// </summary>
-public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
+public class GetSaleHandlerList : IRequestHandler<GetSaleCommandList, GetSaleResultList>
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
     private readonly IPasswordHasher _passwordHasher;
 
     /// <summary>
-    /// Initializes a new instance of GetSaleHandler
+    /// Initializes a new instance of GetSaleHandlerList
     /// </summary>
     /// <param name="saleRepository">The sale repository</param>
     /// <param name="mapper">The AutoMapper instance</param>
     /// <param name="validator">The validator for GetSaleCommand</param>
-    public GetSaleHandler(ISaleRepository saleRepository, IMapper mapper, IPasswordHasher passwordHasher)
+    public GetSaleHandlerList(ISaleRepository saleRepository, IMapper mapper, IPasswordHasher passwordHasher)
     {
         _saleRepository = saleRepository;
         _mapper = mapper;
@@ -36,15 +36,17 @@ public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
     /// <param name="command">The GetSale command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created sale details</returns>
-    public async Task<GetSaleResult> Handle(GetSaleCommand command, CancellationToken cancellationToken)
+    public async Task<GetSaleResultList> Handle(GetSaleCommandList command, CancellationToken cancellationToken)
     {
-        var validator = new GetSaleValidator();
+        var validator = new GetSaleValidatorList();
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
 
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
         Sale? findSale = null;
+        List<Sale> sales = new List<Sale>();
+
         if (command.SaleNumber > 0)
         {
             findSale = await _saleRepository.GetBysaleNumberAsync(command.SaleNumber, cancellationToken);
@@ -57,7 +59,12 @@ public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
             if (findSale == null)
                 throw new HttpRequestException($"Sale with ID {command.Id} not found", null, HttpStatusCode.NotFound);
         }
+        
+        if (findSale == null)
+            sales = await _saleRepository.GetListAsync(command.Page, command.PageSize, command.OrderField, command.OrderAscending, cancellationToken: cancellationToken);
+        else
+            sales.Add(findSale);
 
-        return _mapper.Map<GetSaleResult>(findSale);
+        return _mapper.Map<GetSaleResultList>(sales);
     }
 }

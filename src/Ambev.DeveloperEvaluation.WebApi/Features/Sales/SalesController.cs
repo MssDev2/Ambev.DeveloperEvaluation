@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.WebApi.Features.Sales.PutSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.DeleteSale;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
-using Ambev.DeveloperEvaluation.Common.Validation;
+using Ambev.DeveloperEvaluation.Application.Sales.PutSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
 
@@ -91,6 +93,69 @@ public class SalesController : BaseController
     }
 
     /// <summary>
+    /// Creates a new sale
+    /// </summary>
+    /// <param name="id">The unique identifier of the sale</param>
+    /// <param name="request">The sale update request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The updated sale details</returns>
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ApiResponseWithData<PutSaleResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PutSale([FromRoute] Guid id, [FromBody] PutSaleRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (request.Id == Guid.Empty)
+                request.Id = id;
+            else if (id != request.Id)
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Sale validation error",
+                    Errors = new[] { new ValidationErrorDetail { Error = "Id", Detail = "The ID in the URL does not match the ID in the request body" } }
+                });
+
+            var validator = new PutSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Sale validation error",
+                    Errors = validationResult.Errors.Select(e => (ValidationErrorDetail)e)
+                });
+
+            var command = _mapper.Map<PutSaleCommand>(request);
+
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(_mapper.Map<PutSaleResponse>(response), "Sale updated successfully");
+        }
+        catch (HttpRequestException ex)
+        {
+            var apiResponse = new ApiResponse
+            {
+                Success = false,
+                Message = ex.Message,
+                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+            };
+
+            return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ApiResponse
+            {
+                Success = false,
+                Message = "Sale update error",
+                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+            });
+        }
+    }
+
+    /// <summary>
     /// Retrieves a sale by their ID
     /// </summary>
     /// <param name="id">The unique identifier of the sale</param>
@@ -102,6 +167,9 @@ public class SalesController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSale([FromRoute] Guid id, CancellationToken cancellationToken)
     {
+
+        //[FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string? order = "Date", [FromQuery] string? direction = "asc",        [FromQuery] string? columnFilters = default
+
         try
         {
             var request = new GetSaleRequest { Id = id };
@@ -118,6 +186,64 @@ public class SalesController : BaseController
 
             var command = _mapper.Map<GetSaleCommand>(request.Id);
             
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(_mapper.Map<GetSaleResponse>(response), "Sale retrieved successfully");
+        }
+        catch (HttpRequestException ex)
+        {
+            var apiResponse = new ApiResponse
+            {
+                Success = false,
+                Message = ex.Message,
+                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+            };
+
+            return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ApiResponse
+            {
+                Success = false,
+                Message = "Sale get error",
+                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+            });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a sale by their ID
+    /// </summary>
+    /// <param name="page">The page number</param>
+    /// <param name="size">The page size</param>
+    /// <param name="order">The order field</param>
+    /// <param name="direction">The order direction</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The sale details if found</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiResponseWithData<GetSaleResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetSaleList([FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string order = "", [FromQuery] string direction = "asc", CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var request = new GetSaleRequest { Page = page, PageSize = size, OrderField = order, OrderAscending = (direction == "asc" ? true : false) };
+            
+            var validator = new GetSaleRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Sale validation error",
+                    Errors = validationResult.Errors.Select(e => (ValidationErrorDetail)e)
+                });
+
+            var command = _mapper.Map<GetSaleCommandList>(request);
+
             var response = await _mediator.Send(command, cancellationToken);
 
             return Ok(_mapper.Map<GetSaleResponse>(response), "Sale retrieved successfully");

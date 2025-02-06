@@ -1,13 +1,11 @@
-using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Enums;
-using System.Text.Json.Serialization;
+﻿using Ambev.DeveloperEvaluation.Domain.Enums;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.PutSale;
 
 /// <summary>
-/// API response model for GetSale operation
+/// Represents a request to create a new sale in the system.
 /// </summary>
-public class GetSaleResponse
+public class PutSaleRequest
 {
     /// <summary>
     /// The unique identifier of the created sale
@@ -35,19 +33,13 @@ public class GetSaleResponse
     public string Branch { get; set; } = string.Empty;
 
     /// <summary>
-    /// List of products that belong to the sale
-    /// </summary>
-    public List<SaleItem> Products { get; set; } = new List<SaleItem>();
-
-    /// <summary>
-    /// Indicates whether the sale was cancelled
+    /// Gets or sets the initial status of the sale account.
     /// </summary>
     public SaleStatus IsCancelled { get; set; }
-    public string CancelledText => IsCancelled.ToString();
 
     /// <summary>
-    /// Total sale amount
-    /// Calculated by summing the total amount of each product in the sale
+    /// List of products that belong to the sale
     /// </summary>
-    public decimal TotalSaleAmount => Products.Sum(p => p.TotalAmount);
+    public List<PutSaleItemRequest> Products { get; set; } = new List<PutSaleItemRequest>();
+
 }

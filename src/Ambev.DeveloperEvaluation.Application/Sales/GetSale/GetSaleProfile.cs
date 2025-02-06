@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Ambev.DeveloperEvaluation.Domain.Entities;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
@@ -15,5 +14,10 @@ public class GetSaleProfile : Profile
     public GetSaleProfile()
     {
         CreateMap<Sale, GetSaleResult>();
+
+        CreateMap<List<Sale>, GetSaleResult>();
+
+        CreateMap<List<Sale>, GetSaleResultList>()
+            .ConstructUsing(saleList => new GetSaleResultList(saleList));
     }
 }
