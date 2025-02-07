@@ -83,13 +83,9 @@ public class SaleRepository : ISaleRepository
     /// <param name="id">The unique identifier of the sale</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The sale if found, null otherwise</returns>
-    public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default, bool trackChanges = true)
+    public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         IQueryable<Sale> query = _context.Sales.Include(s => s.Products);
-
-        if (!trackChanges)
-            query = query.AsNoTracking();
-
         return await query.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
     }
 
@@ -132,15 +128,20 @@ public class SaleRepository : ISaleRepository
     /// <param name="orderAscending">True to order ascending, false to order descending</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A list of sales</returns>
-    public async Task<List<Sale>> GetListAsync(int page, int pageSize, string orderField = "", bool orderAscending = true, CancellationToken cancellationToken = default)
+    public async Task<(List<Sale> SalesList, int TotalCount)> GetListAsync(int page, int pageSize, string orderField = "", bool orderAscending = true, CancellationToken cancellationToken = default)
     {
-        var query = _context.Set<Sale>().AsQueryable();
-        if (page > 0 && pageSize > 0)
-            query = query.Skip((page - 1) * pageSize).Take(pageSize);
-        
+        var query = _context.Set<Sale>()
+            .Include(s => s.Products)
+            .AsQueryable();
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
         if (!string.IsNullOrEmpty(orderField))
             query = orderAscending ? query.OrderBy(e => EF.Property<object>(e, orderField)) : query.OrderByDescending(e => EF.Property<object>(e, orderField));
 
-        return await query.AsNoTracking().ToListAsync(cancellationToken);
+        if (page > 0 && pageSize > 0)
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+        return (await query.AsNoTracking().ToListAsync(cancellationToken), totalCount);
     }
 }

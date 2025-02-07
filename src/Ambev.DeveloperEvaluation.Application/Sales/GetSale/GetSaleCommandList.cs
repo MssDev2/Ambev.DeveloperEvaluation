@@ -1,12 +1,10 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
-using Ambev.DeveloperEvaluation.Domain.Enums;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 /// <summary>
-/// Command for creating a new sale.
+/// Command for getting a list of sales
 /// </summary>
 /// <remarks>
 /// This command is used to capture the required data for creating a sale, 
@@ -34,6 +32,7 @@ public class GetSaleCommandList : IRequest<GetSaleResultList>
     /// Page number
     /// </summary>
     public int Page { get; set; }
+
     /// <summary>
     /// Page size
     /// </summary>
@@ -52,7 +51,10 @@ public class GetSaleCommandList : IRequest<GetSaleResultList>
     /// <summary>
     /// Initializes a new instance of GetUSaleCommand
     /// </summary>
-    /// <param name="id">The ID of the sale to retrieve</param>
+    /// <param name="page">The page number</param>
+    /// <param name="pageSize">The page size</param>
+    /// <param name="orderField">The order field</param>
+    /// <param name="orderAscending">True to order ascending, false to order descending</param>
     public GetSaleCommandList(int page, int pageSize, string orderField, bool orderAscending)
     {
         Page = page;

@@ -37,7 +37,7 @@ public class GetSaleResponse
     /// <summary>
     /// List of products that belong to the sale
     /// </summary>
-    public List<SaleItem> Products { get; set; } = new List<SaleItem>();
+    public List<SaleItem> Products { get; set; } = [];
 
     /// <summary>
     /// Indicates whether the sale was cancelled

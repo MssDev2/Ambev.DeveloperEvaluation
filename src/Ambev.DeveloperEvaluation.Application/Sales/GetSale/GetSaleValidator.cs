@@ -3,7 +3,7 @@
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 /// <summary>
-/// Validator for GetSaleCommand that defines validation rules for sale creation command.
+/// Validator for GetSaleCommand that defines validation rules for sale retrieval.
 /// </summary>
 public class GetSaleValidator : AbstractValidator<GetSaleCommand>
 {
@@ -12,11 +12,10 @@ public class GetSaleValidator : AbstractValidator<GetSaleCommand>
     /// </summary>
     /// <remarks>
     /// Validation rules include:
-    /// - SaleNumber: Required, must be greater than 0
+    /// - Id is required
     /// </remarks>
     public GetSaleValidator()
     {
-        //RuleFor(sale => sale.SaleNumber).GreaterThan(0);
         RuleFor(sale => sale.Id).NotEmpty();
     }
 }

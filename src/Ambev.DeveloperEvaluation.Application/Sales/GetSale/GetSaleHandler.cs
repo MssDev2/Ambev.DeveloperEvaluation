@@ -3,7 +3,6 @@ using MediatR;
 using FluentValidation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Common.Security;
 using System.Net;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
@@ -15,7 +14,6 @@ public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
-    private readonly IPasswordHasher _passwordHasher;
 
     /// <summary>
     /// Initializes a new instance of GetSaleHandler
@@ -23,11 +21,10 @@ public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
     /// <param name="saleRepository">The sale repository</param>
     /// <param name="mapper">The AutoMapper instance</param>
     /// <param name="validator">The validator for GetSaleCommand</param>
-    public GetSaleHandler(ISaleRepository saleRepository, IMapper mapper, IPasswordHasher passwordHasher)
+    public GetSaleHandler(ISaleRepository saleRepository, IMapper mapper)
     {
         _saleRepository = saleRepository;
         _mapper = mapper;
-        _passwordHasher = passwordHasher;
     }
 
     /// <summary>

@@ -16,15 +16,12 @@ public class GetSaleProfile : Profile
     {
         CreateMap<GetSaleResult, GetSaleResponse>();
 
-        CreateMap<GetSaleResultList, GetSaleResponse>();
+        CreateMap<GetSaleResultList, GetSaleResponseList>();
 
         CreateMap<Guid, GetSaleCommand>()
             .ConstructUsing(id => new GetSaleCommand(id));
 
         CreateMap<GetSaleRequest, GetSaleCommandList>()
             .ConstructUsing(request => new GetSaleCommandList(request.Page, request.PageSize, request.OrderField, request.OrderAscending));
-
-        //CreateMap<GetSaleResultList, GetSaleResponseList>();
-
     }
 }

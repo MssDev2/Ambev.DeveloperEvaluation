@@ -14,8 +14,14 @@ public class GetSaleRequestValidator : AbstractValidator<GetSaleRequest>
     /// </summary>
     public GetSaleRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty()
-            .WithMessage("Sale ID is required");
+        When(x => x.Id == Guid.Empty, () =>
+        {
+            RuleFor(x => x.Page)
+                .NotEmpty()
+                .WithMessage("Page is required");
+            RuleFor(x => x.PageSize)
+                .NotEmpty()
+                .WithMessage("Page size is required");
+        });
     }
 }

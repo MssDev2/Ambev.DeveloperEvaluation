@@ -1,11 +1,10 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
-using Ambev.DeveloperEvaluation.Domain.Enums;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 /// <summary>
-/// Command for creating a new sale.
+/// Command for retrieving a sale
 /// </summary>
 /// <remarks>
 /// This command is used to capture the required data for creating a sale, 
@@ -28,25 +27,6 @@ public class GetSaleCommand : IRequest<GetSaleResult>
     /// Sale number
     /// </summary>
     public int SaleNumber { get; set; }
-
-    /// <summary>
-    /// Page number
-    /// </summary>
-    public int Page { get; set; }
-    /// <summary>
-    /// Page size
-    /// </summary>
-    public int PageSize { get; set; }
-
-    /// <summary>
-    /// Order field
-    /// </summary>
-    public string OrderField { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Order ascending or descending
-    /// </summary>
-    public bool OrderAscending { get; set; }
 
     /// <summary>
     /// Initializes a new instance of GetUSaleCommand

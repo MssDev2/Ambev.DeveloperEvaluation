@@ -31,7 +31,7 @@ public interface ISaleRepository
     /// <param name="id">The unique identifier of the sale</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The sale if found, null otherwise</returns>
-    Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default, bool trackChanges = true);
+    Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves a sale by their sale number
@@ -58,5 +58,5 @@ public interface ISaleRepository
     /// <param name="orderAscending">True to order ascending, false to order descending</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A list of sales</returns>
-    Task<List<Sale>> GetListAsync(int page, int pageSize, string orderField = "", bool orderAscending = true, CancellationToken cancellationToken = default);
+    Task<(List<Sale> SalesList, int TotalCount)> GetListAsync(int page, int pageSize, string orderField = "", bool orderAscending = true, CancellationToken cancellationToken = default);
 }

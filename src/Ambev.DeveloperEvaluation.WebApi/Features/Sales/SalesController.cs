@@ -23,16 +23,19 @@ public class SalesController : BaseController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ILogger<SalesController> _logger;
 
     /// <summary>
     /// Initializes a new instance of SalesController
     /// </summary>
     /// <param name="mediator">The mediator instance</param>
     /// <param name="mapper">The AutoMapper instance</param>
-    public SalesController(IMediator mediator, IMapper mapper)
+    /// <param name="logger">The logger instance</param>
+    public SalesController(IMediator mediator, IMapper mapper, ILogger<SalesController> logger)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _logger = logger;
     }
 
     /// <summary>
@@ -52,15 +55,17 @@ public class SalesController : BaseController
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
+            {
+                _logger.LogError("Sale validation error: {Errors}", validationResult.Errors);
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
                     Message = "Sale validation error",
                     Errors = validationResult.Errors.Select(e => (ValidationErrorDetail)e)
                 });
+            }
 
             var command = _mapper.Map<CreateSaleCommand>(request);
-
             var response = await _mediator.Send(command, cancellationToken);
 
             return Created(string.Empty, new ApiResponseWithData<CreateSaleResponse>
@@ -72,22 +77,23 @@ public class SalesController : BaseController
         }
         catch (HttpRequestException ex)
         {
+            _logger.LogError(ex, "HttpRequestException");
             var apiResponse = new ApiResponse
             {
                 Success = false,
                 Message = ex.Message,
-                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message }]
             };
-
             return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Sale creation error");
             return BadRequest(new ApiResponse
             {
                 Success = false,
                 Message = "Sale creation error",
-                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "Exception", Detail = ex.Message }]
             });
         }
     }
@@ -109,48 +115,54 @@ public class SalesController : BaseController
             if (request.Id == Guid.Empty)
                 request.Id = id;
             else if (id != request.Id)
+            {
+                _logger.LogError("Sale validation error: The ID in the URL does not match the ID in the request body");
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
                     Message = "Sale validation error",
-                    Errors = new[] { new ValidationErrorDetail { Error = "Id", Detail = "The ID in the URL does not match the ID in the request body" } }
+                    Errors = [new ValidationErrorDetail { Error = "Id", Detail = "The ID in the URL does not match the ID in the request body" }]
                 });
+            }
 
             var validator = new PutSaleRequestValidator();
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
+            {
+                _logger.LogError("Sale validation error: {Errors}", validationResult.Errors);
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
                     Message = "Sale validation error",
                     Errors = validationResult.Errors.Select(e => (ValidationErrorDetail)e)
                 });
+            }
 
             var command = _mapper.Map<PutSaleCommand>(request);
-
             var response = await _mediator.Send(command, cancellationToken);
 
             return Ok(_mapper.Map<PutSaleResponse>(response), "Sale updated successfully");
         }
         catch (HttpRequestException ex)
         {
+            _logger.LogError(ex, "HttpRequestException");
             var apiResponse = new ApiResponse
             {
                 Success = false,
                 Message = ex.Message,
-                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message }]
             };
-
             return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Sale update error");
             return BadRequest(new ApiResponse
             {
                 Success = false,
                 Message = "Sale update error",
-                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "Exception", Detail = ex.Message }]
             });
         }
     }
@@ -167,9 +179,6 @@ public class SalesController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSale([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-
-        //[FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string? order = "Date", [FromQuery] string? direction = "asc",        [FromQuery] string? columnFilters = default
-
         try
         {
             var request = new GetSaleRequest { Id = id };
@@ -177,43 +186,47 @@ public class SalesController : BaseController
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
+            {
+                _logger.LogError("Sale validation error: {Errors}", validationResult.Errors);
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
                     Message = "Sale validation error",
                     Errors = validationResult.Errors.Select(e => (ValidationErrorDetail)e)
                 });
+            }
 
-            var command = _mapper.Map<GetSaleCommand>(request.Id);
-            
+            var command = _mapper.Map<GetSaleCommand>(request.Id);            
             var response = await _mediator.Send(command, cancellationToken);
 
             return Ok(_mapper.Map<GetSaleResponse>(response), "Sale retrieved successfully");
         }
         catch (HttpRequestException ex)
         {
+            _logger.LogError(ex, "HttpRequestException");
             var apiResponse = new ApiResponse
             {
                 Success = false,
                 Message = ex.Message,
-                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message }]
             };
 
             return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Sale get error");
             return BadRequest(new ApiResponse
             {
                 Success = false,
                 Message = "Sale get error",
-                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "Exception", Detail = ex.Message }]
             });
         }
     }
 
     /// <summary>
-    /// Retrieves a sale by their ID
+    /// Retrieves a list of sales by page and size order by a specific field
     /// </summary>
     /// <param name="page">The page number</param>
     /// <param name="size">The page size</param>
@@ -222,50 +235,54 @@ public class SalesController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The sale details if found</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponseWithData<GetSaleResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaginatedResponse<GetSaleResult>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSaleList([FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string order = "", [FromQuery] string direction = "asc", CancellationToken cancellationToken = default)
     {
         try
         {
-            var request = new GetSaleRequest { Page = page, PageSize = size, OrderField = order, OrderAscending = (direction == "asc" ? true : false) };
+            var request = new GetSaleRequest { Page = page, PageSize = size, OrderField = order, OrderAscending = (direction == "asc") };
             
             var validator = new GetSaleRequestValidator();
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
+            {
+                _logger.LogError("Sale validation error: {Errors}", validationResult.Errors);
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
                     Message = "Sale validation error",
                     Errors = validationResult.Errors.Select(e => (ValidationErrorDetail)e)
                 });
+            }
 
             var command = _mapper.Map<GetSaleCommandList>(request);
-
             var response = await _mediator.Send(command, cancellationToken);
 
-            return Ok(_mapper.Map<GetSaleResponse>(response), "Sale retrieved successfully");
+            var pageList = new PaginatedList<GetSaleResult>(response.SaleList, response.TotalCount, page, size);
+            return OkPaginated(pageList);
         }
         catch (HttpRequestException ex)
         {
+            _logger.LogError(ex, "HttpRequestException");
             var apiResponse = new ApiResponse
             {
                 Success = false,
                 Message = ex.Message,
-                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message }]
             };
-
             return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Sale get error");
             return BadRequest(new ApiResponse
             {
                 Success = false,
                 Message = "Sale get error",
-                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "Exception", Detail = ex.Message }]
             });
         }
     }
@@ -289,7 +306,10 @@ public class SalesController : BaseController
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
+            {
+                _logger.LogError("Sale delete validation error: {Errors}", validationResult.Errors);
                 return BadRequest(validationResult.Errors);
+            }
 
             var command = _mapper.Map<DeleteSaleCommand>(request.Id);
             await _mediator.Send(command, cancellationToken);
@@ -298,22 +318,24 @@ public class SalesController : BaseController
         }
         catch (HttpRequestException ex)
         {
+            _logger.LogError(ex, "HttpRequestException");
             var apiResponse = new ApiResponse
             {
                 Success = false,
                 Message = ex.Message,
-                Errors = new[] { new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "HttpRequestException", Detail = ex.Message }]
             };
 
             return new ObjectResult(apiResponse) { StatusCode = (int?)ex.StatusCode };
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Sale delete error");
             return BadRequest(new ApiResponse
             {
                 Success = false,
                 Message = "Sale delete error",
-                Errors = new[] { new ValidationErrorDetail { Error = "Exception", Detail = ex.Message } }
+                Errors = [new ValidationErrorDetail { Error = "Exception", Detail = ex.Message }]
             });
         }
     }

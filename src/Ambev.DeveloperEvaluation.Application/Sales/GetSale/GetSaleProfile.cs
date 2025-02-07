@@ -15,9 +15,9 @@ public class GetSaleProfile : Profile
     {
         CreateMap<Sale, GetSaleResult>();
 
-        CreateMap<List<Sale>, GetSaleResult>();
-
+        //CreateMap<List<Sale>, GetSaleResult>();
+                
         CreateMap<List<Sale>, GetSaleResultList>()
-            .ConstructUsing(saleList => new GetSaleResultList(saleList));
+            .ConstructUsing((src, context) => new GetSaleResultList { SaleList = context.Mapper.Map<List<GetSaleResult>>(src) });
     }
 }

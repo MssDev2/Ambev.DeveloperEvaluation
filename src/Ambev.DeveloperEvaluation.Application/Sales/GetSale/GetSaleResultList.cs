@@ -4,17 +4,19 @@ using Ambev.DeveloperEvaluation.Domain.Enums;
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 /// <summary>
-/// Response model for GetSale operation with a list of sales
+/// Response model for GetSaleList operation with a list of sales
 /// </summary>
 public class GetSaleResultList
 {
     /// <summary>
-    /// List of sales
+    /// List of GetSaleResult
     /// </summary>
-    public List<Sale>? SaleList { get; set; }
+    public List<GetSaleResult> SaleList { get; set; } = [];
 
-    public GetSaleResultList(List<Sale>? saleList)
+    public int TotalCount { get; set; }
+
+    public GetSaleResultList()
     {
-        SaleList = saleList;
+        SaleList = [];
     }
 }
