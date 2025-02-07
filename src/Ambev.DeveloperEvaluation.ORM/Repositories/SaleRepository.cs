@@ -54,7 +54,12 @@ public class SaleRepository : ISaleRepository
         foreach (var saleItemNew in saleNew.Products)
         {
             if (saleOld.Id != saleItemNew.SaleId)
-                throw new KeyNotFoundException($"SaleId {saleItemNew.SaleId} does not match the current Sold");
+            {
+                if (saleItemNew.SaleId == Guid.Empty)
+                    saleItemNew.SaleId = saleOld.Id;
+                else
+                    throw new KeyNotFoundException($"SaleId {saleItemNew.SaleId} does not match the current Sold");
+            }
 
             if (saleItemNew.Id == Guid.Empty)
                 saleOld.Products.Add(saleItemNew);
