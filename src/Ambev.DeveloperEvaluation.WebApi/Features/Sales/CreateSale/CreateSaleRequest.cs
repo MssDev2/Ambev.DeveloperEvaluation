@@ -35,6 +35,5 @@ public class CreateSaleRequest
     /// <summary>
     /// List of products that belong to the sale
     /// </summary>
-    public List<CreateSaleItemRequest> Products { get; set; } = new List<CreateSaleItemRequest>();
-
+    public List<CreateSaleItemRequest> Products { get; set; } = [];
 }

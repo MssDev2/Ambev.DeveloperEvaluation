@@ -1,6 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Enums;
-using Ambev.DeveloperEvaluation.Domain.Validation;
+﻿using Ambev.DeveloperEvaluation.Domain.Enums;
 using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
@@ -8,10 +6,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 /// <summary>
 /// Validator for CreateSaleCommand that defines validation rules for sale creation command.
 /// </summary>
-public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
+public class CreateSaleValidator : AbstractValidator<CreateSaleCommand>
 {
     /// <summary>
-    /// Initializes a new instance of the CreateSaleCommandValidator with defined validation rules.
+    /// Initializes a new instance of the CreateSaleValidator with defined validation rules.
     /// </summary>
     /// <remarks>
     /// Validation rules include:
@@ -20,7 +18,7 @@ public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
     /// - Products: Must have valid discount based on quantity
     /// - Products: Cannot sell more than 20 identical items
     /// </remarks>
-    public CreateSaleCommandValidator()
+    public CreateSaleValidator()
     {
         RuleFor(sale => sale.SaleNumber).GreaterThan(0);
         RuleFor(sale => sale.IsCancelled).NotEqual(SaleStatus.Unknown);

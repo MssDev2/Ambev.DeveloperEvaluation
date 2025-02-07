@@ -3,8 +3,8 @@ using MediatR;
 using FluentValidation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Common.Security;
 using System.Net;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.PutSale;
 
@@ -15,7 +15,6 @@ public class PutSaleHandler : IRequestHandler<PutSaleCommand, PutSaleResult>
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
-    private readonly IPasswordHasher _passwordHasher;
 
     /// <summary>
     /// Initializes a new instance of PutSaleHandler
@@ -23,11 +22,10 @@ public class PutSaleHandler : IRequestHandler<PutSaleCommand, PutSaleResult>
     /// <param name="saleRepository">The sale repository</param>
     /// <param name="mapper">The AutoMapper instance</param>
     /// <param name="validator">The validator for PutSaleCommand</param>
-    public PutSaleHandler(ISaleRepository saleRepository, IMapper mapper, IPasswordHasher passwordHasher)
+    public PutSaleHandler(ISaleRepository saleRepository, IMapper mapper)
     {
         _saleRepository = saleRepository;
         _mapper = mapper;
-        _passwordHasher = passwordHasher;
     }
 
     /// <summary>
@@ -58,7 +56,7 @@ public class PutSaleHandler : IRequestHandler<PutSaleCommand, PutSaleResult>
             }
         }
 
-        var validator = new PutSaleCommandValidator();
+        var validator = new PutSaleValidator();
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
 
         if (!validationResult.IsValid)

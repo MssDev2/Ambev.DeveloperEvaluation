@@ -1,20 +1,19 @@
 ﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using MediatR;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.PutSale;
 
 /// <summary>
-/// Command for creating a new sale.
+/// Command to update a sale
 /// </summary>
 /// <remarks>
-/// This command is used to capture the required data for creating a sale, 
+/// This command is used to capture the required data to update a existing sale 
 /// It implements <see cref="IRequest{TResponse}"/> to initiate the request 
 /// that returns a <see cref="PutSaleResult"/>.
 /// 
 /// The data provided in this command is validated using the 
-/// <see cref="PutSaleCommandValidator"/> which extends 
+/// <see cref="PutSaleValidator"/> which extends 
 /// <see cref="AbstractValidator{T}"/> to ensure that the fields are correctly 
 /// populated and follow the required rules.
 /// </remarks>
@@ -53,7 +52,7 @@ public class PutSaleCommand : IRequest<PutSaleResult>
     /// <summary>
     /// List of products that belong to the sale
     /// </summary>
-    public List<PutSaleItemCommand> Products { get; set; } = new List<PutSaleItemCommand>();
+    public List<PutSaleItemCommand> Products { get; set; } = [];
 
     /// <summary>
     /// Initializes a new instance of PutSaleCommand
@@ -66,7 +65,7 @@ public class PutSaleCommand : IRequest<PutSaleResult>
 
     public ValidationResultDetail Validate()
     {
-        var validator = new PutSaleCommandValidator();
+        var validator = new PutSaleValidator();
         var result = validator.Validate(this);
         return new ValidationResultDetail
         {

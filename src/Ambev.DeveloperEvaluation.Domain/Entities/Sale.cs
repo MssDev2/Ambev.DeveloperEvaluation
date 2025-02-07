@@ -36,7 +36,7 @@ public class Sale : BaseEntity
     /// <summary>
     /// List of products that belong to the sale
     /// </summary>
-    public List<SaleItem> Products { get; set; } = new List<SaleItem>();
+    public List<SaleItem> Products { get; set; } = [];
 
     /// <summary>
     /// Indicates whether the sale was cancelled
@@ -60,12 +60,7 @@ public class Sale : BaseEntity
     /// </returns>
     /// <remarks>
     /// <listheader>The validation includes checking:</listheader>
-    /// <list type="bullet">Username format and length</list>
-    /// <list type="bullet">Email format</list>
-    /// <list type="bullet">Phone number format</list>
-    /// <list type="bullet">Password complexity requirements</list>
-    /// <list type="bullet">Role validity</list>
-    /// 
+    /// <list type="bullet">SaleNumber is greater than 0</list>
     /// </remarks>
     public ValidationResultDetail Validate()
     {

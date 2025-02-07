@@ -11,6 +11,6 @@ public class SaleValidator : AbstractValidator<Sale>
         RuleFor(sale => sale.SaleNumber)
             .GreaterThan(0)
             .LessThan(int.MaxValue)
-            .WithMessage("Sale Numer must be greater than 0 and less than " + int.MaxValue.ToString());
+            .WithMessage("Sale Number must be greater than 0 and less than " + int.MaxValue.ToString());
     }
 }

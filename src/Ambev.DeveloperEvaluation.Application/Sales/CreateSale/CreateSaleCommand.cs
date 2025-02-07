@@ -13,7 +13,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 /// that returns a <see cref="CreateSaleResult"/>.
 /// 
 /// The data provided in this command is validated using the 
-/// <see cref="CreateSaleCommandValidator"/> which extends 
+/// <see cref="CreateSaleValidator"/> which extends 
 /// <see cref="AbstractValidator{T}"/> to ensure that the fields are correctly 
 /// populated and follow the required rules.
 /// </remarks>
@@ -47,12 +47,12 @@ public class CreateSaleCommand : IRequest<CreateSaleResult>
     /// <summary>
     /// List of products that belong to the sale
     /// </summary>
-    public List<CreateSaleItemCommand> Products { get; set; } = new List<CreateSaleItemCommand>();
+    public List<CreateSaleItemCommand> Products { get; set; } = [];
 
 
     public ValidationResultDetail Validate()
     {
-        var validator = new CreateSaleCommandValidator();
+        var validator = new CreateSaleValidator();
         var result = validator.Validate(this);
         return new ValidationResultDetail
         {

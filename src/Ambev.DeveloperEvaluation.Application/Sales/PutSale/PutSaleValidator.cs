@@ -1,14 +1,12 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Enums;
-using Ambev.DeveloperEvaluation.Domain.Validation;
+﻿using Ambev.DeveloperEvaluation.Domain.Enums;
 using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.PutSale;
 
 /// <summary>
-/// Validator for PutSaleCommand that defines validation rules for sale creation command.
+/// Validator for PutSaleCommand that defines validation rules for sale update.
 /// </summary>
-public class PutSaleCommandValidator : AbstractValidator<PutSaleCommand>
+public class PutSaleValidator : AbstractValidator<PutSaleCommand>
 {
     /// <summary>
     /// Initializes a new instance of the PutSaleCommandValidator with defined validation rules.
@@ -20,7 +18,7 @@ public class PutSaleCommandValidator : AbstractValidator<PutSaleCommand>
     /// - Products: Must have valid discount based on quantity
     /// - Products: Cannot sell more than 20 identical items
     /// </remarks>
-    public PutSaleCommandValidator()
+    public PutSaleValidator()
     {
         RuleFor(sale => sale.SaleNumber).GreaterThan(0);
         RuleFor(sale => sale.IsCancelled).NotEqual(SaleStatus.Unknown);
