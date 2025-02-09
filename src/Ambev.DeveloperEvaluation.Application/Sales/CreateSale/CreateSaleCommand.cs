@@ -49,7 +49,6 @@ public class CreateSaleCommand : IRequest<CreateSaleResult>
     /// </summary>
     public List<CreateSaleItemCommand> Products { get; set; } = [];
 
-
     public ValidationResultDetail Validate()
     {
         var validator = new CreateSaleValidator();
