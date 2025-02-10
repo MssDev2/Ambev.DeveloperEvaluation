@@ -124,16 +124,47 @@ public class SaleRepository : ISaleRepository
         return true;
     }
 
+    private static string ToPascalCase(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            return str;
+
+        if (str.Length == 1)
+            return char.ToUpper(str[0]).ToString();
+
+        return char.ToUpper(str[0]) + str.Substring(1);
+    }
+
+    private static Dictionary<string, bool> ParseOrderField(string orderField)
+    {
+        var orderDict = new Dictionary<string, bool>();
+
+        if (string.IsNullOrEmpty(orderField))
+            return orderDict;
+
+        var fields = orderField.Split(',');
+        foreach (var field in fields)
+        {
+            var parts = field.Trim().Split(' ');
+            var fieldName = parts[0];
+            var orderAscending = parts.Length < 2 || parts[1].Equals("asc", StringComparison.OrdinalIgnoreCase);
+
+            orderDict.Add(fieldName, orderAscending);
+        }
+
+        return orderDict;
+    }
+
     /// <summary>
     /// Retrieves a sales list by page and size order by a specific field
     /// </summary>
     /// <param name="page">The page number</param>
     /// <param name="pageSize">The number of items per page</param>
-    /// <param name="orderField">The field to order by</param>
-    /// <param name="orderAscending">True to order ascending, false to order descending</param>
+    /// <param name="orderFields">The field to order by and direction (field1 asc, field2 desc)</param>
+    /// <param name="filters">Dictionary with filters (key: field name, value: filter value)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A list of sales</returns>
-    public async Task<(List<Sale> SalesList, int TotalCount)> GetListAsync(int page, int pageSize, string orderField = "", bool orderAscending = true, CancellationToken cancellationToken = default)
+    public async Task<(List<Sale> SalesList, int TotalCount)> GetListFilterAsync(int page, int pageSize, string orderFields = "", Dictionary<string, string>? filters = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Set<Sale>()
             .Include(s => s.Products)
@@ -141,9 +172,71 @@ public class SaleRepository : ISaleRepository
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        if (!string.IsNullOrEmpty(orderField))
-            query = orderAscending ? query.OrderBy(e => EF.Property<object>(e, orderField)) : query.OrderByDescending(e => EF.Property<object>(e, orderField));
+        // Apply filters
+        if (filters != null)
+        {
+            foreach (var filter in filters)
+            {
+                if (filter.Key.StartsWith("_min") || filter.Key.StartsWith("_max"))
+                {
+                    var fieldName = filter.Key.Substring(4);
+                    var isMin = filter.Key.StartsWith("_min");
+                    fieldName = ToPascalCase(fieldName);
 
+                    if (typeof(Sale).GetProperty(fieldName) == null)
+                    {
+                        var errorMessage = $"The field '{fieldName}' does not exist in the Sale entity.";
+                        throw new Exception(errorMessage);
+                    }
+
+                    if (decimal.TryParse(filter.Value, out decimal decimalValue))
+                    {
+                        query = isMin
+                            ? query.Where(e => EF.Property<decimal>(e, fieldName) >= decimalValue)
+                            : query.Where(e => EF.Property<decimal>(e, fieldName) <= decimalValue);
+                    }
+                    else if (DateTime.TryParse(filter.Value, out DateTime dateValue))
+                    {
+                        var dateValueUTC = DateTime.SpecifyKind(dateValue, DateTimeKind.Utc);
+                        query = isMin
+                            ? query.Where(e => EF.Property<DateTime>(e, fieldName) >= dateValueUTC)
+                            : query.Where(e => EF.Property<DateTime>(e, fieldName) <= dateValueUTC);
+                    }
+                }
+                else
+                {
+                    string fieldName = ToPascalCase(filter.Key) ?? "";
+                    if (typeof(Sale).GetProperty(fieldName) == null)
+                    {
+                        var errorMessage = $"The field '{fieldName}' does not exist in the Sale entity.";
+                        throw new Exception(errorMessage);
+                    }
+                    if (filter.Value.Contains('*'))
+                        query = query.Where(e => EF.Functions.Like(EF.Property<string>(e, fieldName), filter.Value.Replace("*", "%")));
+                    else
+                        query = query.Where(e => EF.Property<string>(e, fieldName) == filter.Value);
+                }
+            }
+        }
+
+        // Apply ordering
+        if (!string.IsNullOrEmpty(orderFields))
+        {
+            orderFields = orderFields.Replace("\"", "");
+            var orderDict = ParseOrderField(orderFields);
+            foreach (var kvp in orderDict)
+            {
+                var fieldName = ToPascalCase(kvp.Key);
+                if (typeof(Sale).GetProperty(fieldName) == null)
+                {
+                    var errorMessage = $"The field '{fieldName}' does not exist in the Sale entity.";
+                    throw new Exception(errorMessage);
+                }
+                query = kvp.Value ? query.OrderBy(e => EF.Property<object>(e, fieldName)) : query.OrderByDescending(e => EF.Property<object>(e, fieldName));
+            }
+        }
+
+        // Apply pagination
         if (page > 0 && pageSize > 0)
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 

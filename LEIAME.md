@@ -158,21 +158,6 @@ Passo a passo para configurar e executar o projeto.
    - Navegue até a pasta onde você descompactou os arquivos do projeto.
    - Selecione o arquivo de solução do projeto (`.sln`) e clique em "Abrir".
 
-
-### Configuração Adicional no Visual Studio
-
-1. **Restaurar Dependências do Projeto**
-   - No Visual Studio, vá para o "Gerenciador de Soluções" (Solution Explorer).
-   - Clique com o botão direito do mouse no nome da solução e selecione "Restaurar Pacotes NuGet" para instalar todas as dependências necessárias.
-
-2. **Configurar a Conexão com o Banco de Dados**
-   - Certifique-se de que o PostgreSQL esteja em execução. Você pode usar Docker para configurar um contêiner do PostgreSQL:
-     ```bash
-     docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=senha postgres
-     ```
-   - No Visual Studio, configure a string de conexão do banco de dados no arquivo de configurações (`appsettings.json`) com as credenciais apropriadas.
-
-
 ### Passo a Passo para Configurar a Conexão com o Banco de Dados
 
 1. **Abrir o Arquivo docker-compose.yml**

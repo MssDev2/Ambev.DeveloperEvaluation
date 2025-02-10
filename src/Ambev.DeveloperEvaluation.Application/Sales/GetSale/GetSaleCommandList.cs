@@ -39,28 +39,29 @@ public class GetSaleCommandList : IRequest<GetSaleResultList>
     public int PageSize { get; set; }
 
     /// <summary>
-    /// Order field
+    /// Order fields (Field1 asc, Field2 desc) 
     /// </summary>
-    public string OrderField { get; set; } = string.Empty;
+    public string OrderFields { get; set; } = string.Empty;
 
     /// <summary>
-    /// Order ascending or descending
+    /// Filters (Key: Field, Value: Value)
     /// </summary>
-    public bool OrderAscending { get; set; }
+    public Dictionary<string, string>? Filters { get; set; }
 
     /// <summary>
     /// Initializes a new instance of GetUSaleCommand
     /// </summary>
     /// <param name="page">The page number</param>
     /// <param name="pageSize">The page size</param>
-    /// <param name="orderField">The order field</param>
-    /// <param name="orderAscending">True to order ascending, false to order descending</param>
-    public GetSaleCommandList(int page, int pageSize, string orderField, bool orderAscending)
+    /// <param name="orderFields">The order field</param>
+    /// <param name="filters">The filters</param>
+
+    public GetSaleCommandList(int page, int pageSize, string orderFields, Dictionary<string, string>? filters)
     {
         Page = page;
         PageSize = pageSize;
-        OrderField = orderField;
-        OrderAscending = orderAscending;
+        OrderFields = orderFields;
+        Filters = filters;
     }
 
     public ValidationResultDetail Validate()

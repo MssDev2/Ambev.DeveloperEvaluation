@@ -59,7 +59,7 @@ If a sale contains 5 units of "Product A" and 3 units of "Product A", the API sh
 {
   "saleNumber": "12345",
   "saleDate": "2025-02-07T15:30:00",
-  "customer": "João Silva",
+  "customer": "John Smith",
   "branch": "Central Branch",
   "products": [
     {
@@ -120,7 +120,7 @@ The value **0: Unknown** is not accepted in requests.
 Step-by-step instructions for setting up and running the project.
 
 #### Prerequisites
-- Installed Windows 10/11 64-bit
+- Installed Windows 10/11 64-bits
 - Internet access and GitHub site access
 
 ### Step-by-Step Instructions for Installing the Tools
@@ -141,6 +141,8 @@ Step-by-step instructions for setting up and running the project.
    - Select the "Download ZIP" option from the dropdown menu.
    - The project's ZIP file will be downloaded to your computer.
 
+   ![GitHub Download ZIP](https://docs.github.com/assets/images/help/repository/code-button.png) 
+
 3. **Unzip the Project ZIP**
    - Navigate to the folder where the ZIP file was downloaded.
    - Right-click on the ZIP file and select "Extract All..." or a similar option.
@@ -151,20 +153,6 @@ Step-by-step instructions for setting up and running the project.
    - In Visual Studio, click "Open a project or solution" on the start screen.
    - Navigate to the folder where you unzipped the project files.
    - Select the project solution file (`.sln`) and click "Open".
-
-### Additional Configuration in Visual Studio
-
-1. **Restore Project Dependencies**
-   - In Visual Studio, go to the "Solution Explorer".
-   - Right-click on the solution name and select "Restore NuGet Packages" to install all necessary dependencies.
-
-2. **Configure the Database Connection**
-   - Ensure PostgreSQL is running. You can use Docker to set up a PostgreSQL container:
-     ```bash
-     docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=password postgres
-     ```
-   - In Visual Studio, configure the database connection string in the configuration file (`appsettings.json`) with the appropriate credentials.
-
 
 ### Step-by-Step Instructions for Configuring the Database Connection
 
@@ -269,10 +257,18 @@ Swagger is a tool that simplifies API documentation and testing. It automaticall
 
 ![Swagger Home Screen](./Swagger01.png)
 
+### CRUD Operations in the API
+
+In the Swagger interface, you'll see a list of available endpoints organized by controller.
+- **CreateSale**: Creates a new sales record.
+- **GetSale (by ID)**: Returns details of a specific sale based on the provided ID.
+- **GetSales (paginated and sorted list)**: Returns a list of sales with pagination and sorting support.
+- **UpdateSale**: Updates the details of an existing sale based on the provided ID.
+- **DeleteSale**: Removes an existing sales record based on the provided ID.
+
 #### Example of Using Swagger for the `CreateSale` API
 
 1. **Navigate to the `CreateSale` Endpoint**
-   - In the Swagger interface, you'll see a list of available endpoints organized by controller.
    - Find the `POST /api/sales` endpoint (or similar) that corresponds to creating a sale (`CreateSale`).
 
 2. **View Endpoint Documentation**
@@ -309,15 +305,39 @@ Swagger is a tool that simplifies API documentation and testing. It automaticall
    - After filling in the data, click the "Execute" button to send the request to the endpoint.
    - You'll see the API response below the form, including the HTTP status code and response data.
 
-By following these steps, you will be able to run the project, open Swagger, and test the `CreateSale` API using Swagger's interactive interface.
+#### Example of Using Swagger for the `GetSaleList` API
 
-### CRUD Operations in the API
+1. **Navigate to the `GetSaleList` Endpoint**
+   - Find the `GET /api/sales` endpoint (or similar) that corresponds to retrieves a list of sales by page and size order by a specific fields, and filters by specific fields (`GetSaleList`).
 
-- **CreateSale**: Creates a new sales record.
-- **GetSale (by ID)**: Returns details of a specific sale based on the provided ID.
-- **GetSales (paginated and sorted list)**: Returns a list of sales with pagination and sorting support.
-- **UpdateSale**: Updates the details of an existing sale based on the provided ID.
-- **DeleteSale**: Removes an existing sales record based on the provided ID.
+2. **View Endpoint Documentation**
+   - Click on the `GET /api/sales` endpoint to expand the documentation.
+   - You'll see details about the endpoint, such as the URL, HTTP method, expected parameters, and endpoint description.
+
+3. **Test the `GetSaleList` Endpoint**
+   - Click the "Try it out" button to enable endpoint testing.
+   - This will enable the interactive form where you can input the parameters for the request.
+   
+4. **Fill in the Parameters**
+   - **_page**: The page number (e.g., `1`).
+   - **_size**: The page size (e.g., `10`).
+   - **_order**: The order fields in the format `Field1 asc, Field2 desc` (e.g., `saleNumber asc, saleDate desc`).
+   - **filters**: Dynamic filters for specific fields, formatted as key-value pairs (e.g., `customer=JohnDoe`, `branch=MainBranch`, `_minSaleDate=2025-01-01`, `_maxSaleDate=2025-12-31`).
+
+5. **Execute the Request**
+   - After filling in the parameters, click the "Execute" button to send the request to the API.
+
+### Example Request Parameters in Swagger
+
+- **_page**: `1`
+- **_size**: `10`
+- **_order**: `saleNumber asc, saleDate desc`
+- **filters**:
+  - `customer`: `JohnDoe`
+  - `branch`: `MainBranch`
+  - `_minSaleDate`: `2025-01-01`
+  - `_maxSaleDate`: `2025-12-31`
+
 
 ### Final Considerations
 

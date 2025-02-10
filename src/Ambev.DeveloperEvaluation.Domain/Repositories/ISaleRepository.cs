@@ -50,13 +50,13 @@ public interface ISaleRepository
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves a sales list by page and size order by a specific field
+    /// Retrieves a sales list by page and size order by a specific field and filter
     /// </summary>
     /// <param name="page">The page number</param>
     /// <param name="pageSize">The number of items per page</param>
-    /// <param name="orderField">The field to order by</param>
-    /// <param name="orderAscending">True to order ascending, false to order descending</param>
+    /// <param name="orderFields">The field to order by and direction (field1 asc, field2 desc)</param>
+    /// <param name="filters">Dictionary with filters (key: field name, value: filter value)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A list of sales</returns>
-    Task<(List<Sale> SalesList, int TotalCount)> GetListAsync(int page, int pageSize, string orderField = "", bool orderAscending = true, CancellationToken cancellationToken = default);
+    Task<(List<Sale> SalesList, int TotalCount)> GetListFilterAsync(int page, int pageSize, string orderFields = "", Dictionary<string, string>? filters = null, CancellationToken cancellationToken = default);
 }
