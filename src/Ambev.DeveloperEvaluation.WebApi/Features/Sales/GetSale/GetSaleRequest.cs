@@ -28,12 +28,12 @@ public class GetSaleRequest
     public int PageSize { get; set; }
 
     /// <summary>
-    /// Order field
+    /// Order fields (Field1 asc, Field2 desc)
     /// </summary>
-    public string OrderField { get; set; } = string.Empty;
+    public string OrderFields { get; set; } = string.Empty;
 
     /// <summary>
-    /// Order ascending or descending
+    /// Filters (Key: Field, Value: Value)
     /// </summary>
-    public bool OrderAscending { get; set; }
+    public Dictionary<string, string>? Filters { get; set; }
 }

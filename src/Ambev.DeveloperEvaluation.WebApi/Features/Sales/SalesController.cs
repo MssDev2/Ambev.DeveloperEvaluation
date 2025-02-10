@@ -226,23 +226,30 @@ public class SalesController : BaseController
     }
 
     /// <summary>
-    /// Retrieves a list of sales by page and size order by a specific field
+    /// Retrieves a list of sales by page and size order by a specific fields, and filters by specific fields
     /// </summary>
-    /// <param name="page">The page number</param>
-    /// <param name="size">The page size</param>
-    /// <param name="order">The order field</param>
-    /// <param name="direction">The order direction</param>
+    /// <param name="_page">The page number</param>
+    /// <param name="_size">The page size</param>
+    /// <param name="_order">The order fields (Field1 asc, Field2 desc)</param>
+    /// <param name="filters">The filters (Key: Field, Value: Value)</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The sale details if found</returns>
+    /// <returns>The list of sales and products list</returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedResponse<GetSaleResult>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSaleList([FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string order = "", [FromQuery] string direction = "asc", CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetSaleList([FromQuery] int _page = 1, [FromQuery] int _size = 10, [FromQuery] string _order = "", [FromQuery] Dictionary<string, string>? filters = null, CancellationToken cancellationToken = default)
     {
         try
         {
-            var request = new GetSaleRequest { Page = page, PageSize = size, OrderField = order, OrderAscending = (direction == "asc") };
+            if (filters != null)
+            {
+                filters.Remove("_page");
+                filters.Remove("_size");
+                filters.Remove("_order");
+            }
+
+            var request = new GetSaleRequest { Page = _page, PageSize = _size, OrderFields = _order, Filters = filters };
             
             var validator = new GetSaleRequestValidator();
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
@@ -261,7 +268,7 @@ public class SalesController : BaseController
             var command = _mapper.Map<GetSaleCommandList>(request);
             var response = await _mediator.Send(command, cancellationToken);
 
-            var pageList = new PaginatedList<GetSaleResult>(response.SaleList, response.TotalCount, page, size);
+            var pageList = new PaginatedList<GetSaleResult>(response.SaleList, response.TotalCount, _page, _size);
             return OkPaginated(pageList);
         }
         catch (HttpRequestException ex)

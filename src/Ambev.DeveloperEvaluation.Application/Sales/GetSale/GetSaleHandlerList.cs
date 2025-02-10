@@ -39,7 +39,7 @@ public class GetSaleHandlerList : IRequestHandler<GetSaleCommandList, GetSaleRes
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var (salesList, totalCount) = await _saleRepository.GetListAsync(command.Page, command.PageSize, command.OrderField, command.OrderAscending, cancellationToken: cancellationToken);
+        var (salesList, totalCount) = await _saleRepository.GetListFilterAsync(command.Page, command.PageSize, command.OrderFields, command.Filters, cancellationToken: cancellationToken);
 
         var ret = _mapper.Map<GetSaleResultList>(salesList);
         ret.TotalCount = totalCount;
